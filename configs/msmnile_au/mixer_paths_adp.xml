@@ -285,7 +285,7 @@
 
     <!-- icc-call and anc-loopback -->
     <ctl name="SEC_TDM_RX_0 Audio Mixer MultiMedia9" value="0" />
-    <ctl name="MultiMedia9 Mixer PRI_TDM_TX_0" value="0" />
+    <ctl name="MultiMedia9 Mixer TERT_TDM_TX_0" value="0" />
 
     <!-- These are audio route (FE to BE) specific mixer settings -->
 
@@ -1298,38 +1298,38 @@
 
     <!-- The following use cases are used for car streams  -->
     <path name="media-playback">
-        <ctl name="PRI_TDM_RX_0 Channels" value="Six" />
-        <ctl name="PRI_TDM_RX_0 Audio Mixer MultiMedia1" value="1" />
+        <ctl name="TERT_TDM_RX_0 Channels" value="Six" />
+        <ctl name="TERT_TDM_RX_0 Audio Mixer MultiMedia1" value="1" />
     </path>
 
-    <path name="sys-notification-playback sys-bus-out">
-        <ctl name="PRI_TDM_RX_0 Channels" value="Six" />
-        <ctl name="PRI_TDM_RX_0 Audio Mixer MultiMedia5" value="1" />
+    <path name="sys-notification-playback">
+        <ctl name="TERT_TDM_RX_0 Channels" value="Six" />
+        <ctl name="TERT_TDM_RX_0 Audio Mixer MultiMedia5" value="1" />
     </path>
 
-    <path name="nav-guidance-playback nav-bus-out">
-        <ctl name="PRI_TDM_RX_1 Channels" value="One" />
-        <ctl name="PRI_TDM_RX_1 Audio Mixer MultiMedia2" value="1" />
+    <path name="nav-guidance-playback">
+        <ctl name="TERT_TDM_RX_1 Channels" value="One" />
+        <ctl name="TERT_TDM_RX_1 Audio Mixer MultiMedia2" value="1" />
     </path>
 
-    <path name="phone-playback phone-bus-out">
-        <ctl name="PRI_TDM_RX_2 Channels" value="One" />
-        <ctl name="PRI_TDM_RX_2 Audio Mixer MultiMedia10" value="1" />
+    <path name="phone-playback">
+        <ctl name="TERT_TDM_RX_2 Channels" value="One" />
+        <ctl name="TERT_TDM_RX_2 Audio Mixer MultiMedia10" value="1" />
     </path>
 
-    <path name="front-passenger-playback pax-bus-out">
+    <path name="front-passenger-playback">
         <ctl name="QUAT_TDM_RX_0 Channels" value="Eight" />
         <ctl name="QUAT_TDM_RX_0 Audio Mixer MultiMedia23" value="1" />
     </path>
 
-    <path name="rear-seat-playback rse-bus-out">
+    <path name="rear-seat-playback">
         <ctl name="QUIN_TDM_RX_0 Channels" value="Sixteen" />
         <ctl name="QUIN_TDM_RX_0 Audio Mixer MultiMedia22" value="1" />
     </path>
 
     <path name="audio-record">
-        <ctl name="PRI_TDM_TX_0 Channels" value="Four" />
-        <ctl name="MultiMedia1 Mixer PRI_TDM_TX_0" value="1" />
+        <ctl name="TERT_TDM_TX_0 Channels" value="Four" />
+        <ctl name="MultiMedia1 Mixer TERT_TDM_TX_0" value="1" />
     </path>
 
     <path name="front-passenger-record">
@@ -1343,8 +1343,8 @@
     </path>
 
     <path name="audio-record headset-mic">
-        <ctl name="PRI_TDM_TX_0 Channels" value="One" />
-        <ctl name="MultiMedia1 Mixer PRI_TDM_TX_0" value="1" />
+        <ctl name="TERT_TDM_TX_0 Channels" value="One" />
+        <ctl name="MultiMedia1 Mixer TERT_TDM_TX_0" value="1" />
     </path>
 
     <path name="audio-record usb-headset-mic">
@@ -1361,22 +1361,18 @@
     </path>
 
     <path name="audio-record capture-fm">
-        <ctl name="PRI_TDM_TX_0 Channels" value="One" />
-        <ctl name="MultiMedia1 Mixer PRI_TDM_TX_0" value="1" />
-    </path>
-
-    <path name="echo-reference-external">
-        <ctl name="MultiMedia2 Mixer SEC_TDM_TX_0" value="1" />
+        <ctl name="TERT_TDM_TX_0 Channels" value="One" />
+        <ctl name="MultiMedia1 Mixer TERT_TDM_TX_0" value="1" />
     </path>
 
     <path name="audio-record-compress">
-        <ctl name="PRI_TDM_TX_0 Channels" value="One" />
-        <ctl name="MultiMedia8 Mixer PRI_TDM_TX_0" value="1" />
+        <ctl name="TERT_TDM_TX_0 Channels" value="One" />
+        <ctl name="MultiMedia8 Mixer TERT_TDM_TX_0" value="1" />
     </path>
 
     <path name="audio-record-compress headset-mic">
-        <ctl name="PRI_TDM_TX_0 Channels" value="One" />
-        <ctl name="MultiMedia8 Mixer PRI_TDM_TX_0" value="1" />
+        <ctl name="TERT_TDM_TX_0 Channels" value="One" />
+        <ctl name="MultiMedia8 Mixer TERT_TDM_TX_0" value="1" />
     </path>
 
     <path name="audio-record-compress bt-sco">
@@ -1393,13 +1389,13 @@
     </path>
 
     <path name="audio-record-compress2">
-        <ctl name="PRI_TDM_TX_0 Channels" value="One" />
-        <ctl name="MultiMedia17 Mixer PRI_TDM_TX_0" value="1" />
+        <ctl name="TERT_TDM_TX_0 Channels" value="One" />
+        <ctl name="MultiMedia17 Mixer TERT_TDM_TX_0" value="1" />
     </path>
 
     <path name="audio-record-compress2 headset-mic">
-        <ctl name="PRI_TDM_TX_0 Channels" value="One" />
-        <ctl name="MultiMedia17 Mixer PRI_TDM_TX_0" value="1" />
+        <ctl name="TERT_TDM_TX_0 Channels" value="One" />
+        <ctl name="MultiMedia17 Mixer TERT_TDM_TX_0" value="1" />
     </path>
 
     <path name="audio-record-compress2 usb-headset-mic">
@@ -1416,13 +1412,13 @@
     </path>
 
     <path name="low-latency-record">
-        <ctl name="PRI_TDM_TX_0 Channels" value="One" />
-        <ctl name="MultiMedia8 Mixer PRI_TDM_TX_0" value="1" />
+        <ctl name="TERT_TDM_TX_0 Channels" value="One" />
+        <ctl name="MultiMedia8 Mixer TERT_TDM_TX_0" value="1" />
     </path>
 
     <path name="low-latency-record headset-mic">
-        <ctl name="PRI_TDM_TX_0 Channels" value="One" />
-        <ctl name="MultiMedia8 Mixer PRI_TDM_TX_0" value="1" />
+        <ctl name="TERT_TDM_TX_0 Channels" value="One" />
+        <ctl name="MultiMedia8 Mixer TERT_TDM_TX_0" value="1" />
     </path>
 
     <path name="low-latency-record bt-sco">
@@ -1439,13 +1435,13 @@
     </path>
 
     <path name="low-latency-record capture-fm">
-        <ctl name="PRI_TDM_TX_0 Channels" value="One" />
-      <ctl name="MultiMedia8 Mixer PRI_TDM_TX_0" value="1" />
+        <ctl name="TERT_TDM_TX_0 Channels" value="One" />
+      <ctl name="MultiMedia8 Mixer TERT_TDM_TX_0" value="1" />
     </path>
 
     <path name="fm-virtual-record capture-fm">
-        <ctl name="PRI_TDM_TX_0 Channels" value="One" />
-        <ctl name="MultiMedia2 Mixer PRI_TDM_TX_0" value="1" />
+        <ctl name="TERT_TDM_TX_0 Channels" value="One" />
+        <ctl name="MultiMedia2 Mixer TERT_TDM_TX_0" value="1" />
     </path>
 
     <path name="play-fm">
@@ -1611,17 +1607,18 @@
     </path>
 
     <path name="icc-call">
-        <ctl name="PRI_TDM_RX_0 Channels" value="Six" />
-        <ctl name="PRI_TDM_RX_0 Audio Mixer MultiMedia9" value="1" />
-        <ctl name="PRI_TDM_TX_0 Channels" value="Four" />
-        <ctl name="MultiMedia9 Mixer PRI_TDM_TX_0" value="1" />
+        <ctl name="SEC_TDM_RX_0 SampleRate" value="KHZ_16" />
+        <ctl name="SEC_TDM_RX_0 Channels" value="Four" />
+        <ctl name="SEC_TDM_RX_0 Audio Mixer MultiMedia9" value="1" />
+        <ctl name="TERT_TDM_TX_0 Channels" value="Four" />
+        <ctl name="MultiMedia9 Mixer TERT_TDM_TX_0" value="1" />
     </path>
 
     <path name="anc-loopback">
         <ctl name="SEC_TDM_RX_0 Channels" value="Four" />
         <ctl name="SEC_TDM_RX_0 Audio Mixer MultiMedia9" value="1" />
-        <ctl name="PRI_TDM_TX_0 Channels" value="Four" />
-        <ctl name="MultiMedia9 Mixer PRI_TDM_TX_0" value="1" />
+        <ctl name="TERT_TDM_TX_0 Channels" value="Four" />
+        <ctl name="MultiMedia9 Mixer TERT_TDM_TX_0" value="1" />
     </path>
 
     <path name="hfp-sco headphones">
@@ -1636,17 +1633,17 @@
     </path>
 
     <path name="hfp-sco">
-        <ctl name="SEN_TDM_RX_1 Audio Mixer MultiMedia6" value="1" />
-        <ctl name="MultiMedia6 Mixer PRI_TDM_TX_0" value="1" />
+        <ctl name="AUX_PCM_RX Audio Mixer MultiMedia6" value="1" />
+        <ctl name="MultiMedia6 Mixer TERT_TDM_TX_0" value="1" />
     </path>
 
     <path name="hfp-sco bt-sco">
-        <ctl name="PTI_TDM_TX_0 Channels" value="One" />
+        <ctl name="TERT_TDM_TX_0 Channels" value="One" />
         <path name="hfp-sco" />
     </path>
 
     <path name="hfp-sco bt-sco-mmsecns">
-        <ctl name="PTI_TDM_TX_0 Channels" value="Four" />
+        <ctl name="TERT_TDM_TX_0 Channels" value="Four" />
         <path name="hfp-sco" />
     </path>
 
@@ -1656,12 +1653,12 @@
     </path>
 
     <path name="hfp-sco-wb bt-sco-wb">
-        <ctl name="PRI_TDM_TX_0 Channels" value="One" />
+        <ctl name="TERT_TDM_TX_0 Channels" value="One" />
         <path name="hfp-sco-wb" />
     </path>
 
     <path name="hfp-sco-wb bt-sco-mmsecns">
-        <ctl name="PRI_TDM_TX_0 Channels" value="Four" />
+        <ctl name="TERT_TDM_TX_0 Channels" value="Four" />
         <path name="hfp-sco-wb" />
     </path>
 
@@ -1671,8 +1668,8 @@
     </path>
 
     <path name="hfp-sco-downlink">
-        <ctl name="PRI_TDM_RX_2 Audio Mixer MultiMedia21" value="1" />
-        <ctl name="MultiMedia21 Mixer SEN_TDM_TX_1" value="1" />
+        <ctl name="TERT_TDM_RX_2 Audio Mixer MultiMedia21" value="1" />
+        <ctl name="MultiMedia21 Mixer AUX_PCM_UL_TX" value="1" />
     </path>
 
     <path name="hfp-sco-wb-downlink">
