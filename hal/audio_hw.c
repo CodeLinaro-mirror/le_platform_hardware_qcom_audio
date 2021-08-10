@@ -2336,20 +2336,9 @@ int select_devices(struct audio_device *adev, audio_usecase_t uc_id)
             }
 
             switch(out_snd_device){
-            case SND_DEVICE_OUT_HANDSET:
-                out_snd_device = SND_DEVICE_OUT_ECALL_HANDSET;
-                break;
-            case SND_DEVICE_OUT_VOICE_HANDSET:
-                out_snd_device = SND_DEVICE_OUT_ECALL_HANDSET;
-                break;
-            case SND_DEVICE_OUT_SPEAKER:
-                out_snd_device = SND_DEVICE_OUT_ECALL_SPEAKER;
-                break;
-            case SND_DEVICE_OUT_VOICE_SPEAKER:
-                out_snd_device = SND_DEVICE_OUT_ECALL_SPEAKER;
-                break;
-            case SND_DEVICE_OUT_VOICE_HEADPHONES:
-                out_snd_device = SND_DEVICE_OUT_ECALL_HEADPHONES;
+            case SND_DEVICE_OUT_ECALL_SPEAKER:
+            case SND_DEVICE_OUT_ECALL_HANDSET:
+            case SND_DEVICE_OUT_ECALL_HEADPHONES:
                 break;
             default:
                 ALOGE(" default ecall out snd case");
@@ -4427,6 +4416,10 @@ static int out_set_parameters(struct audio_stream *stream, const char *kvpairs)
     err = str_parms_get_str(parms, AUDIO_PARAMETER_STREAM_ROUTING, value, sizeof(value));
     if (err >= 0) {
         val = atoi(value);
+
+        if(out->devices & AUDIO_DEVICE_BIT_IN)
+           goto routing_fail;
+
         lock_output_stream(out);
         pthread_mutex_lock(&adev->lock);
 
