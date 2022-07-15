@@ -854,8 +854,8 @@ int main(int argc, char* argv[]) {
         qahw_set_parameters(qahw_mod_handle, params[0].kvpairs);
     }
 
-    pthread_t tid[MAX_RECORD_SESSIONS];
-    pthread_t sourcetrack_thread;
+    pthread_t tid[MAX_RECORD_SESSIONS] = {0};
+    pthread_t sourcetrack_thread = 0;
     int ret = -1;
 
     if (source_tracking && max_recordings_requested) {

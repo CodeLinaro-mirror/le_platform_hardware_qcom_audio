@@ -1960,6 +1960,11 @@ static void platform_reset_edid_info(void *platform) {
 const char *platform_get_mixer_FM_RX_control(struct audio_device *adev) {
     char *snd_card_name = NULL;
 
+    if (mixer_get_name(adev->mixer) == NULL) {
+        ALOGE("%s: failed to mixer_get_name\n",__func__);
+        return NULL;
+    }
+
     snd_card_name = strdup(mixer_get_name(adev->mixer));
     if (!snd_card_name) {
         ALOGE("%s: failed to allocate memory for snd_card_name\n",__func__);
@@ -3240,6 +3245,11 @@ void *platform_init(struct audio_device *adev)
     }
     ALOGD("%s: Opened sound card:%d", __func__, adev->snd_card);
 
+    if (mixer_get_name(adev->mixer) == NULL) {
+        ALOGE("failed to mixer_get_name\n");
+        audio_extn_utils_close_snd_mixer(adev->mixer);
+        return NULL;
+    }
     snd_card_name = strdup(mixer_get_name(adev->mixer));
     if (!snd_card_name) {
         ALOGE("failed to allocate memory for snd_card_name\n");
@@ -11883,19 +11893,19 @@ int platform_get_vi_feedback_snd_device(snd_device_t snd_device)
 int platform_spkr_prot_is_wsa_analog_mode(void *adev __unused)
 {
    struct audio_device *adev_h = adev;
-   const char *snd_card_name;
+   const char *snd_card_name = NULL;
 
    /*
     * wsa analog mode is decided based on the sound card name
     */
    snd_card_name = mixer_get_name(adev_h->mixer);
-   if ((!strcmp(snd_card_name, "msm8953-snd-card-mtp")) ||
-       (!strcmp(snd_card_name, "msm8953-sku4-snd-card")) ||
-       (!strcmp(snd_card_name, "sdm439-sku1-snd-card")) ||
-       (!strcmp(snd_card_name, "sdm439-snd-card-mtp")))
-       return 1;
-   else
-       return 0;
+   if (snd_card_name != NULL)
+       if ((!strcmp(snd_card_name, "msm8953-snd-card-mtp")) ||
+          (!strcmp(snd_card_name, "msm8953-sku4-snd-card")) ||
+          (!strcmp(snd_card_name, "sdm439-sku1-snd-card")) ||
+          (!strcmp(snd_card_name, "sdm439-snd-card-mtp")))
+              return 1;
+  return 0;
 }
 
 /*

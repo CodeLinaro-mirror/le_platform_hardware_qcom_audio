@@ -4151,6 +4151,12 @@ int start_output_stream(struct stream_out *out)
                                    out->pcm_device_id,
                                    COMPRESS_IN, &out->compr_config);
         ATRACE_END();
+        if (out->compr == NULL) {
+           ALOGE("%s: compress_open failed\n", __func__);
+           ret = -EIO;
+           goto error_open;
+        }
+
         if (errno == ENETRESET && !is_compress_ready(out->compr)) {
                 ALOGE("%s: compress_open failed errno:%d\n", __func__, errno);
                 adev->card_status = CARD_STATUS_OFFLINE;
