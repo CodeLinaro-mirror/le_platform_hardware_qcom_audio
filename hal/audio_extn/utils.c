@@ -2462,7 +2462,7 @@ done:
 int audio_extn_utils_compress_get_dsp_latency(struct stream_out *out)
 {
     int ret = -EINVAL;
-    struct snd_compr_metadata metadata;
+    struct snd_compr_metadata metadata = {0};
     int delay_ms = COMPRESS_OFFLOAD_PLAYBACK_LATENCY;
 
     /* override the latency for pcm offload use case */

@@ -1170,7 +1170,7 @@ int measure_kpi_values(qahw_stream_handle_t* out_handle, bool is_offload) {
     size_t bytes_written = 0;
     char  *data = NULL;
     int ret = 0, count = 0;
-    struct timespec ts_cold, ts_cont;
+    struct timespec ts_cold = {0}, ts_cont = {0};
     uint64_t tcold, tcont, scold = 0, uscold = 0, scont = 0, uscont = 0;
 
     if (is_offload) {

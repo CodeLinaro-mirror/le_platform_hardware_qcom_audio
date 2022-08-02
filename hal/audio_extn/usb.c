@@ -465,10 +465,13 @@ static int usb_get_capability(int type,
         goto done;
     }
 
+
     if(read(fd, read_buf, USB_BUFF_SIZE) < 0) {
         ALOGE("file read error\n");
         goto done;
     }
+    read_buf[USB_BUFF_SIZE] = '\0';
+
     str_start = strstr(read_buf, ((type == USB_PLAYBACK) ?
                        PLAYBACK_PROFILE_STR : CAPTURE_PROFILE_STR));
     if (str_start == NULL) {

@@ -135,9 +135,9 @@ typedef struct trnscode_loopback_config {
 
 transcode_loopback_config_t g_trnscode_loopback_config;
 
-static int poll_data_event_exit()
+static int poll_data_event_exit(void)
 {
-   close(sock_event_fd);
+   return close(sock_event_fd);
 }
 
 void break_signal_handler(int signal __attribute__((unused)))
