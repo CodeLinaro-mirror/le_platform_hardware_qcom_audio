@@ -98,6 +98,14 @@
 #define AUDIO_OUTPUT_FLAG_INTERACTIVE 0x4000000
 #endif
 
+#ifndef AUDIO_DEVICE_IN_SPEAKER_MIC2
+#define AUDIO_DEVICE_IN_SPEAKER_MIC2 0x10000000
+#endif
+
+#ifndef AUDIO_DEVICE_IN_SPEAKER_MIC3
+#define AUDIO_DEVICE_IN_SPEAKER_MIC3 0x20000000
+#endif
+
 int audio_extn_parse_compress_metadata(struct stream_out *out,
                                        struct str_parms *parms);
 
@@ -1414,6 +1422,7 @@ typedef struct auto_hal_init_config {
     fp_platform_set_echo_reference_t             fp_platform_set_echo_reference;
     fp_platform_get_eccarstate_t                 fp_platform_get_eccarstate;
     fp_generate_patch_handle_t                   fp_generate_patch_handle;
+    fp_platform_get_pcm_device_id_t              fp_platform_get_pcm_device_id;
 } auto_hal_init_config_t;
 // END: AUTO_HAL FEATURE ==================================================
 
