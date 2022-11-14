@@ -560,13 +560,15 @@ void *start_input(void *thread_param)
 }
 
 int read_config_params_from_user(struct audio_config_params *thread_param) {
+    char* input = NULL;
     printf(" \n Enter input device (4->built-in mic, 16->wired_headset .. etc) ::::: ");
     scanf(" %d", &thread_param->input_device);
     thread_param->input_device |= AUDIO_DEVICE_BIT_IN;
 
     if (thread_param->input_device == AUDIO_DEVICE_IN_BLUETOOTH_SCO_HEADSET) {
          printf(" \n Enable wbs for BT sco?? (1 - Enable 0 - Disable) ::::: ");
-         scanf("%d", &thread_param->bt_wbs);
+	 fgets(input, 2, stdin);
+	 thread_param->bt_wbs = (_Bool *)input;
     }
 
     printf(" \n Enter the format (1 ->16 bit pcm recording, 6 -> 24 bit packed pcm recording) ::::: ");
