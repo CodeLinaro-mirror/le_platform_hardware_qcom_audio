@@ -16,8 +16,13 @@ else
 endif
 
 ifeq ($(ENABLE_AUDIO_LEGACY_TECHPACK),true)
+ifeq ($(TARGET_BOARD_AUTO),true)
+  LIBRARY_TINYCOMPRESS := libqti-tinycompress
+  LIBRARY_TINYCOMPRESS_INC := $(TOP)/vendor/qcom/opensource/tinycompress/include
+else
   LIBRARY_TINYCOMPRESS := libtinycompress
   LIBRARY_TINYCOMPRESS_INC := external/tinycompress/include
+endif
   LOCAL_CFLAGS += -DENABLE_AUDIO_LEGACY_PURE
 endif
 #--------------------------------------------
@@ -1249,12 +1254,18 @@ LOCAL_C_INCLUDES:= \
         system/media/audio/include
 
 LOCAL_SHARED_LIBRARIES:= \
-        android.frameworks.automotive.powerpolicy-V1-ndk_platform \
         libbase \
         libbinder_ndk \
         libcutils \
         liblog \
         libpowerpolicyclient
+
+# *-ndk_platform migrated to *-ndk from Android T onwards
+ifeq ($(call math_gt_or_eq, $(PLATFORM_SDK_VERSION), 33), true)
+    LOCAL_SHARED_LIBRARIES += android.frameworks.automotive.powerpolicy-V1-ndk
+else
+    LOCAL_SHARED_LIBRARIES += android.frameworks.automotive.powerpolicy-V1-ndk_platform
+endif
 
 ifneq ($(filter kona lahaina holi,$(TARGET_BOARD_PLATFORM)),)
 LOCAL_SANITIZE := integer_overflow

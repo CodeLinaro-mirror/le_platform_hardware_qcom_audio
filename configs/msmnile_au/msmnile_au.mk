@@ -123,7 +123,7 @@ endif
 ifneq ($(ENABLE_HYP),true)
 AUDIO_FEATURE_ENABLED_AUTO_AUDIOD := true
 
-ifneq ( ,$(filter msmnile_au msmnile_tb, $(TARGET_PRODUCT)))
+ifneq ( ,$(filter msmnile_au msmnile_au_km4 msmnile_au_ar msmnile_tb, $(TARGET_PRODUCT)))
 AUDIO_FEATURE_ENABLED_DAEMON_SUPPORT := true
 else
 AUDIO_FEATURE_ENABLED_DAEMON_SUPPORT := false
@@ -140,7 +140,7 @@ AUDIO_FEATURE_ENABLED_ICC := true
 ifneq ( ,$(filter S 12 T 13, $(PLATFORM_VERSION)))
 AUDIO_FEATURE_ENABLED_POWER_POLICY := true
 endif
-ifneq ( ,$(filter msmnile_gvmq msmnile_au, $(TARGET_BOARD_PLATFORM)$(TARGET_BOARD_SUFFIX)))
+ifneq ( ,$(filter msmnile_gvmq msmnile_au msmnile_au_km4 msmnile_au_ar, $(TARGET_BOARD_PLATFORM)$(TARGET_BOARD_SUFFIX)$(TARGET_BOARD_DERIVATIVE_SUFFIX)))
 AUDIO_FEATURE_ENABLED_AUDIO_PARSERS := true
 endif
 ##AUTOMOTIVE_AUDIO_FEATURE_FLAGS
@@ -150,14 +150,20 @@ ifneq ($(strip $(TARGET_USES_RRO)), true)
 DEVICE_PACKAGE_OVERLAYS += vendor/qcom/opensource/audio-hal/primary-hal/configs/common/overlay
 endif
 
+ifneq ( ,$(filter T 13, $(PLATFORM_VERSION)))
+ifneq ( ,$(filter msmnile_au msmnile_au_km4 msmnile_au_ar, $(TARGET_BOARD_PLATFORM)$(TARGET_BOARD_SUFFIX))$(TARGET_BOARD_DERIVATIVE_SUFFIX))
+AUDIO_FEATURE_MMAP_AAUDIO = true
+endif
+endif
+
 #Automotive audio specific device overlays
 DEVICE_PACKAGE_OVERLAYS += vendor/qcom/opensource/audio-hal/primary-hal/configs/common_au/overlay
 
 PRODUCT_COPY_FILES += \
+    vendor/qcom/opensource/audio-hal/primary-hal/configs/msmnile_au/mixer_paths_adp.xml:$(TARGET_COPY_OUT_VENDOR)/etc/mixer_paths_adp.xml \
     vendor/qcom/opensource/audio-hal/primary-hal/configs/msmnile_au/audio_io_policy.conf:$(TARGET_COPY_OUT_VENDOR)/etc/audio_io_policy.conf \
     vendor/qcom/opensource/audio-hal/primary-hal/configs/msmnile_au/audio_effects.conf:$(TARGET_COPY_OUT_VENDOR)/etc/audio_effects.conf \
     vendor/qcom/opensource/audio-hal/primary-hal/configs/msmnile_au/audio_effects.xml:$(TARGET_COPY_OUT_VENDOR)/etc/audio_effects.xml \
-    vendor/qcom/opensource/audio-hal/primary-hal/configs/msmnile_au/mixer_paths_adp.xml:$(TARGET_COPY_OUT_VENDOR)/etc/mixer_paths_adp.xml \
     vendor/qcom/opensource/audio-hal/primary-hal/configs/msmnile_au/mixer_paths_sa8295_adp.xml:$(TARGET_COPY_OUT_VENDOR)/etc/mixer_paths_sa8295_adp.xml \
     vendor/qcom/opensource/audio-hal/primary-hal/configs/msmnile_au/audio_tuning_mixer.txt:$(TARGET_COPY_OUT_VENDOR)/etc/audio_tuning_mixer.txt \
     vendor/qcom/opensource/audio-hal/primary-hal/configs/msmnile_au/sound_trigger_platform_info.xml:$(TARGET_COPY_OUT_VENDOR)/etc/sound_trigger_platform_info.xml \
@@ -310,8 +316,18 @@ PRODUCT_PROPERTY_OVERRIDES += \
 ro.bluetooth.a2dp_offload.supported=true
 
 # Disable A2DP offload
+ifeq ($(ENABLE_HYP), true)
+ifeq ($(TARGET_GVMGH_SPECIFIC), false)
+PRODUCT_PROPERTY_OVERRIDES += \
+persist.bluetooth.a2dp_offload.disabled=true
+else
 PRODUCT_PROPERTY_OVERRIDES += \
 persist.bluetooth.a2dp_offload.disabled=false
+endif
+else
+PRODUCT_PROPERTY_OVERRIDES += \
+persist.bluetooth.a2dp_offload.disabled=false
+endif
 
 # A2DP offload DSP supported encoder list
 PRODUCT_PROPERTY_OVERRIDES += \
@@ -440,7 +456,8 @@ vendor.audio.feature.audiozoom.enable=false \
 vendor.audio.feature.auto_hal.enable=true \
 vendor.audio.feature.synth.enable=true \
 vendor.audio.feature.powerpolicy.enable=true \
-vendor.audio.feature.concurrent_pcm_record.enable=true
+vendor.audio.feature.concurrent_pcm_record.enable=true \
+vendor.audio.feature.concurrent_low_latency_pcm_record.enable=true
 ifeq ($(AUDIO_FEATURE_ENABLED_SND_MONITOR), true)
 PRODUCT_ODM_PROPERTIES += \
 vendor.audio.feature.snd_mon.enable=true
@@ -495,7 +512,8 @@ vendor.audio.feature.audiozoom.enable=false \
 vendor.audio.feature.auto_hal.enable=true \
 vendor.audio.feature.synth.enable=true \
 vendor.audio.feature.powerpolicy.enable=true \
-vendor.audio.feature.concurrent_pcm_record.enable=true
+vendor.audio.feature.concurrent_pcm_record.enable=true \
+vendor.audio.feature.concurrent_low_latency_pcm_record.enable=true
 ifeq ($(AUDIO_FEATURE_ENABLED_SND_MONITOR), true)
 PRODUCT_ODM_PROPERTIES += \
 vendor.audio.feature.snd_mon.enable=true
@@ -547,7 +565,7 @@ PRODUCT_PACKAGES_DEBUG += \
     AudioSettings
 
 # for HIDL related audiocontrol packages
-ifeq ( ,$(filter 12 13,$(PLATFORM_VERSION)))
+ifeq ( ,$(filter 12 13 T U UpsideDownCake 14,$(PLATFORM_VERSION)))
 PRODUCT_PACKAGES += \
     android.hardware.automotive.audiocontrol@2.0-service \
     android.hardware.automotive.audiocontrol@2.0
