@@ -26,6 +26,43 @@
 * OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN
 * IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
+
+/*
+* Changes from Qualcomm Innovation Center are provided under the following license:
+*
+* Copyright (c) 2023 Qualcomm Innovation Center, Inc. All rights reserved.
+*
+* Redistribution and use in source and binary forms, with or without
+* modification, are permitted (subject to the limitations in the
+* disclaimer below) provided that the following conditions are met:
+*
+*    * Redistributions of source code must retain the above copyright
+*      notice, this list of conditions and the following disclaimer.
+*
+*    * Redistributions in binary form must reproduce the above
+*      copyright notice, this list of conditions and the following
+*      disclaimer in the documentation and/or other materials provided
+*      with the distribution.
+*
+*    * Neither the name of Qualcomm Innovation Center, Inc. nor the names of its
+*      contributors may be used to endorse or promote products derived
+*      from this software without specific prior written permission.
+*
+* NO EXPRESS OR IMPLIED LICENSES TO ANY PARTY'S PATENT RIGHTS ARE
+* GRANTED BY THIS LICENSE. THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT
+* HOLDERS AND CONTRIBUTORS "AS IS" AND ANY EXPRESS OR IMPLIED
+* WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF
+* MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED.
+* IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE FOR
+* ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL
+* DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE
+* GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
+* INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER
+* IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR
+* OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN
+* IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+*/
+
 #define LOG_TAG "a2dp_offload"
 /*#define LOG_NDEBUG 0*/
 #define LOG_NDDEBUG 0
@@ -42,6 +79,7 @@
 #include <hardware/audio.h>
 #include <hardware/hardware.h>
 #include <cutils/properties.h>
+#include <system/audio.h>
 
 #ifdef DYNAMIC_LOG_ENABLED
 #include <log_xml_parser.h>
@@ -51,6 +89,7 @@
 
 #define BT_IPC_SOURCE_LIB_NAME "btaudio_offload_if.so"
 #define BT_IPC_SINK_LIB_NAME    "libbthost_if_sink.so"
+#define BT_IPC_SOURCE_LIB2_NAME  "libbthost_if.so"
 #define MEDIA_FMT_NONE                                     0
 #define MEDIA_FMT_AAC                                      0x00010DA6
 #define MEDIA_FMT_APTX                                     0x000131ff
@@ -247,9 +286,9 @@ typedef int (*audio_source_suspend_t)(void);
 typedef void (*audio_source_handoff_triggered_t)(void);
 typedef void (*clear_source_a2dpsuspend_flag_t)(void);
 typedef void * (*audio_get_enc_config_t)(uint8_t *multicast_status,
-                                uint8_t *num_dev, codec_t *codec_type);
+                                uint8_t *num_dev, audio_format_t *codec_type);
 typedef int (*audio_source_check_a2dp_ready_t)(void);
-typedef int (*audio_is_source_scrambling_enabled_t)(void);
+typedef bool (*audio_is_source_scrambling_enabled_t)(void);
 typedef bool (*audio_is_tws_mono_mode_enable_t)(void);
 typedef int (*audio_sink_start_t)(void);
 typedef int (*audio_sink_stop_t)(void);
@@ -1165,7 +1204,13 @@ static void a2dp_source_init()
         a2dp.bt_lib_source_handle = dlopen(BT_IPC_SOURCE_LIB_NAME, RTLD_NOW);
         if (a2dp.bt_lib_source_handle == NULL) {
             ALOGE("%s: dlopen failed for %s", __func__, BT_IPC_SOURCE_LIB_NAME);
-            return;
+            ALOGD("%s Falling back to %s since LE uses non-hidl based", __func__,
+                                BT_IPC_SOURCE_LIB2_NAME);
+            a2dp.bt_lib_source_handle = dlopen(BT_IPC_SOURCE_LIB2_NAME, RTLD_NOW);
+            if(a2dp.bt_lib_source_handle == NULL) {
+                ALOGE("%s: DLOPEN failed for %s", __func__, BT_IPC_SOURCE_LIB2_NAME);
+                return;
+            }
         }
     }
 
@@ -1309,7 +1354,7 @@ static void a2dp_check_and_set_scrambler()
     if (a2dp.audio_is_source_scrambling_enabled && (a2dp.bt_state_source != A2DP_STATE_DISCONNECTED))
         scrambler_mode = a2dp.audio_is_source_scrambling_enabled();
 
-    if (scrambler_mode) {
+    if (scrambler_mode == true) {
         //enable scrambler in dsp
         ctrl_scrambler_mode = mixer_get_ctl_by_name(a2dp.adev->mixer,
                                             MIXER_SCRAMBLER_MODE);
@@ -2379,6 +2424,16 @@ static int update_aptx_dsp_config_v1(struct custom_enc_cfg_t *aptx_dsp_cfg,
 
     return ret;
 }
+
+static void audio_a2dp_update_tws_channel_mode()
+{
+    return;
+}
+
+static void audio_a2dp_update_lc3_channel_mode()
+{
+    return;
+}
 #endif
 
 /* API to configure APTX DSP encoder */
@@ -2852,6 +2907,7 @@ bool configure_a2dp_encoder_format()
     void *codec_info = NULL;
     uint8_t multi_cast = 0, num_dev = 1;
     codec_t codec_type = CODEC_TYPE_INVALID;
+    audio_format_t audio_format = AUDIO_FORMAT_INVALID;
     bool is_configured = false;
     audio_aptx_encoder_config aptx_encoder_cfg;
 
@@ -2861,11 +2917,12 @@ bool configure_a2dp_encoder_format()
     }
     ALOGD("configure_a2dp_encoder_format start");
     codec_info = a2dp.audio_get_enc_config(&multi_cast, &num_dev,
-                               &codec_type);
+                               &audio_format);
 
     // ABR disabled by default for all codecs
     a2dp.abr_config.is_abr_enabled = false;
     a2dp.is_aptx_adaptive = false;
+    codec_type = (codec_t) audio_format;
 
     switch(codec_type) {
         case CODEC_TYPE_SBC:

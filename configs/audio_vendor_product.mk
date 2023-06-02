@@ -36,6 +36,7 @@ MM_AUDIO += audio_effects.conf
 MM_AUDIO += ftm_test_config
 MM_AUDIO += libFlacSwDec
 MM_AUDIO += libAlacSwDec
+MM_AUDIO += libOmxAlacDec
 MM_AUDIO += libApeSwDec
 MM_AUDIO += libMpeghSwEnc
 MM_AUDIO += libdsd2pcm
@@ -132,6 +133,10 @@ MM_AUDIO += IOT_Hdmi_cal.acdb
 MM_AUDIO += IOT_Headset_cal.acdb
 MM_AUDIO += IOT_Speaker_cal.acdb
 MM_AUDIO += IOT_workspaceFile.qwsp
+ifeq ($(TARGET_BOARD_PLATFORM),kona)
+MM_AUDIO += fai__4.7.2_0.0__3.0.0_0.0__3.1.2_0.0__3.2.0_0.1__eai_1.10.pmd
+MM_AUDIO += fai__4.8.4_0.0__3.0.0_0.0__3.1.1_0.0__3.2.0_0.1__eai_1.10.pmd
+endif
 ifeq ($(TARGET_BOARD_AUTO),true)
 MM_AUDIO += adsp_avs_config.acdb
 MM_AUDIO += Bluetooth_cal.acdb
