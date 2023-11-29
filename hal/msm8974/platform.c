@@ -2348,7 +2348,8 @@ void platform_set_echo_reference(struct audio_device *adev, bool enable,
             strlcat(ec_ref_mixer_path, " handset",
                     MIXER_PATH_MAX_LENGTH);
         else if (compare_device_type(out_devices, AUDIO_DEVICE_OUT_WIRED_HEADPHONE) ||
-                 compare_device_type(out_devices, AUDIO_DEVICE_OUT_WIRED_HEADSET))
+                 compare_device_type(out_devices, AUDIO_DEVICE_OUT_WIRED_HEADSET) ||
+                 compare_device_type(out_devices, AUDIO_DEVICE_OUT_LINE))
             strlcat(ec_ref_mixer_path, " headphones",
                     MIXER_PATH_MAX_LENGTH);
         else if (compare_device_type(out_devices, AUDIO_DEVICE_OUT_USB_HEADSET))
@@ -7533,8 +7534,8 @@ static snd_device_t get_snd_device_for_voice_comm_ecns_enabled(struct platform_d
                                  : SND_DEVICE_IN_SPEAKER_QMIC_AEC_NS;
             } else if ((my_data->fluence_type & FLUENCE_TRI_MIC) &&
                        (my_data->source_mic_type & SOURCE_THREE_MIC)) {
-                    if (property_get_bool("persist.vendor.audio.msteams.acdb.enabled", false) &&
-                              my_data->fluence_nn_enabled) {
+                    if ((property_get_bool("persist.vendor.audio.msteams.acdb.enabled", false) &&
+                         adev->msteams_cert_cal_on) && my_data->fluence_nn_enabled) {
                         snd_device = SND_DEVICE_IN_SPEAKER_TMIC_NN;
                     } else {
                         snd_device = my_data->fluence_nn_enabled ?
@@ -7562,8 +7563,8 @@ static snd_device_t get_snd_device_for_voice_comm_ecns_enabled(struct platform_d
     } else if (compare_device_type(in_devices, AUDIO_DEVICE_IN_BUILTIN_MIC)) {
         if ((my_data->fluence_type & FLUENCE_TRI_MIC) &&
             (my_data->source_mic_type & SOURCE_THREE_MIC)) {
-            if (property_get_bool("persist.vendor.audio.msteams.acdb.enabled", false) &&
-                              my_data->fluence_nn_enabled) {
+            if ((property_get_bool("persist.vendor.audio.msteams.acdb.enabled", false) &&
+                 adev->msteams_cert_cal_on) && my_data->fluence_nn_enabled) {
                 snd_device = SND_DEVICE_IN_HANDSET_TMIC_NN;
             } else {
                 snd_device = my_data->fluence_nn_enabled ?
@@ -7611,8 +7612,8 @@ static snd_device_t get_snd_device_for_voice_comm_ecns_disabled(struct platform_
                                      : SND_DEVICE_IN_SPEAKER_QMIC_AEC_NS;
                 } else if ((my_data->fluence_type & FLUENCE_TRI_MIC) &&
                            (my_data->source_mic_type & SOURCE_THREE_MIC)) {
-                    if (property_get_bool("persist.vendor.audio.msteams.acdb.enabled", false) &&
-                              my_data->fluence_nn_enabled) {
+                    if ((property_get_bool("persist.vendor.audio.msteams.acdb.enabled", false) &&
+                         adev->msteams_cert_cal_on) && my_data->fluence_nn_enabled) {
                         snd_device = SND_DEVICE_IN_SPEAKER_TMIC_NN;
                     } else {
                         snd_device = my_data->fluence_nn_enabled ?
@@ -7641,8 +7642,8 @@ static snd_device_t get_snd_device_for_voice_comm_ecns_disabled(struct platform_
         } else if (compare_device_type(in_devices, AUDIO_DEVICE_IN_BUILTIN_MIC)) {
             if ((my_data->fluence_type & FLUENCE_TRI_MIC) &&
                 (my_data->source_mic_type & SOURCE_THREE_MIC)) {
-                if (property_get_bool("persist.vendor.audio.msteams.acdb.enabled", false) &&
-                                  my_data->fluence_nn_enabled) {
+                if ((property_get_bool("persist.vendor.audio.msteams.acdb.enabled", false) &&
+                    adev->msteams_cert_cal_on) && my_data->fluence_nn_enabled) {
                     snd_device = SND_DEVICE_IN_HANDSET_TMIC_NN;
                 } else {
                     snd_device = my_data->fluence_nn_enabled ?
