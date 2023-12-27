@@ -228,6 +228,13 @@
 
 #define GET_IN_DEVICE_INDEX(SND_DEVICE) ((SND_DEVICE) - (SND_DEVICE_IN_BEGIN))
 
+#define is_native_samplerate_supported_in_snd_dev(x) \
+    (is_usb_in_snd_dev(x) ||                                             \
+    ((x) == SND_DEVICE_IN_SPDIF) ||                                      \
+    ((x) == SND_DEVICE_IN_HDMI_MIC) ||                                   \
+    ((x) == SND_DEVICE_IN_HDMI_MIC_DSD) ||                               \
+    ((x) == SND_DEVICE_IN_HDMI_ARC))
+
 #define is_usb_in_snd_dev(x) \
     (((x) == SND_DEVICE_IN_USB_HEADSET_MIC) ||                           \
     ((x) == SND_DEVICE_IN_USB_HEADSET_MIC_AEC) ||                        \
@@ -2341,7 +2348,8 @@ void platform_set_echo_reference(struct audio_device *adev, bool enable,
             strlcat(ec_ref_mixer_path, " handset",
                     MIXER_PATH_MAX_LENGTH);
         else if (compare_device_type(out_devices, AUDIO_DEVICE_OUT_WIRED_HEADPHONE) ||
-                 compare_device_type(out_devices, AUDIO_DEVICE_OUT_WIRED_HEADSET))
+                 compare_device_type(out_devices, AUDIO_DEVICE_OUT_WIRED_HEADSET) ||
+                 compare_device_type(out_devices, AUDIO_DEVICE_OUT_LINE))
             strlcat(ec_ref_mixer_path, " headphones",
                     MIXER_PATH_MAX_LENGTH);
         else if (compare_device_type(out_devices, AUDIO_DEVICE_OUT_USB_HEADSET))
@@ -3864,6 +3872,10 @@ void *platform_init(struct audio_device *adev)
                sizeof("sa8295-adp-star-snd-card"))) {
         platform_info_init(get_xml_file_path(PLATFORM_INFO_XML_PATH_SA8295_ADP),
             my_data, PLATFORM);
+    } else if (!strncmp(snd_card_name, "trinket-idp-snd-card",
+               sizeof("trinket-idp-snd-card"))) {
+        platform_info_init(get_xml_file_path(PLATFORM_INFO_XML_PATH_INTCODEC_NAME),
+            my_data, PLATFORM);
     } else if (my_data->is_internal_codec && (strstr(snd_card_name, "sdm429w") == NULL)) {
         platform_info_init(get_xml_file_path(PLATFORM_INFO_XML_PATH_INTCODEC_NAME),
             my_data, PLATFORM);
@@ -3956,11 +3968,21 @@ void *platform_init(struct audio_device *adev)
          }
 #endif
 
-    /* CSRA devices support multiple sample rates via I2S at spkr out */
-    if (!strncmp(snd_card_name, "qcs405-csra", strlen("qcs405-csra")))
+    if (!strncmp(snd_card_name, "qcs405-csra", strlen("qcs405-csra"))) {
+        /* CSRA devices support default bit width via I2S at spkr out */
+        my_data->use_spkr_default_bit_width = true;
+        ALOGI("%s: soundcard: %s supports only default bit width", __func__, snd_card_name);
+
+        /* CSRA devices support multiple sample rates via I2S at spkr out */
         my_data->use_sprk_default_sample_rate = false;
-    else
+        ALOGI("%s: soundcard: %s supports multiple sample rates", __func__, snd_card_name);
+    } else {
+        my_data->use_spkr_default_bit_width = false;
+        ALOGI("%s: soundcard: %s supports multiple bit width", __func__, snd_card_name);
+
         my_data->use_sprk_default_sample_rate = true;
+        ALOGI("%s: soundcard: %s supports only default sample rate", __func__, snd_card_name);
+    }
 
     my_data->voice_feature_set = VOICE_FEATURE_SET_DEFAULT;
     my_data->acdb_handle = dlopen(LIB_ACDB_LOADER, RTLD_NOW);
@@ -7522,8 +7544,8 @@ static snd_device_t get_snd_device_for_voice_comm_ecns_enabled(struct platform_d
                                  : SND_DEVICE_IN_SPEAKER_QMIC_AEC_NS;
             } else if ((my_data->fluence_type & FLUENCE_TRI_MIC) &&
                        (my_data->source_mic_type & SOURCE_THREE_MIC)) {
-                    if (property_get_bool("persist.vendor.audio.msteams.acdb.enabled", false) &&
-                              my_data->fluence_nn_enabled) {
+                    if ((property_get_bool("persist.vendor.audio.msteams.acdb.enabled", false) &&
+                         adev->msteams_cert_cal_on) && my_data->fluence_nn_enabled) {
                         snd_device = SND_DEVICE_IN_SPEAKER_TMIC_NN;
                     } else {
                         snd_device = my_data->fluence_nn_enabled ?
@@ -7551,8 +7573,8 @@ static snd_device_t get_snd_device_for_voice_comm_ecns_enabled(struct platform_d
     } else if (compare_device_type(in_devices, AUDIO_DEVICE_IN_BUILTIN_MIC)) {
         if ((my_data->fluence_type & FLUENCE_TRI_MIC) &&
             (my_data->source_mic_type & SOURCE_THREE_MIC)) {
-            if (property_get_bool("persist.vendor.audio.msteams.acdb.enabled", false) &&
-                              my_data->fluence_nn_enabled) {
+            if ((property_get_bool("persist.vendor.audio.msteams.acdb.enabled", false) &&
+                 adev->msteams_cert_cal_on) && my_data->fluence_nn_enabled) {
                 snd_device = SND_DEVICE_IN_HANDSET_TMIC_NN;
             } else {
                 snd_device = my_data->fluence_nn_enabled ?
@@ -7600,8 +7622,8 @@ static snd_device_t get_snd_device_for_voice_comm_ecns_disabled(struct platform_
                                      : SND_DEVICE_IN_SPEAKER_QMIC_AEC_NS;
                 } else if ((my_data->fluence_type & FLUENCE_TRI_MIC) &&
                            (my_data->source_mic_type & SOURCE_THREE_MIC)) {
-                    if (property_get_bool("persist.vendor.audio.msteams.acdb.enabled", false) &&
-                              my_data->fluence_nn_enabled) {
+                    if ((property_get_bool("persist.vendor.audio.msteams.acdb.enabled", false) &&
+                         adev->msteams_cert_cal_on) && my_data->fluence_nn_enabled) {
                         snd_device = SND_DEVICE_IN_SPEAKER_TMIC_NN;
                     } else {
                         snd_device = my_data->fluence_nn_enabled ?
@@ -7630,8 +7652,8 @@ static snd_device_t get_snd_device_for_voice_comm_ecns_disabled(struct platform_
         } else if (compare_device_type(in_devices, AUDIO_DEVICE_IN_BUILTIN_MIC)) {
             if ((my_data->fluence_type & FLUENCE_TRI_MIC) &&
                 (my_data->source_mic_type & SOURCE_THREE_MIC)) {
-                if (property_get_bool("persist.vendor.audio.msteams.acdb.enabled", false) &&
-                                  my_data->fluence_nn_enabled) {
+                if ((property_get_bool("persist.vendor.audio.msteams.acdb.enabled", false) &&
+                    adev->msteams_cert_cal_on) && my_data->fluence_nn_enabled) {
                     snd_device = SND_DEVICE_IN_HANDSET_TMIC_NN;
                 } else {
                     snd_device = my_data->fluence_nn_enabled ?
@@ -8951,7 +8973,7 @@ static void set_audiocal(void *platform, struct str_parms *parms, char *value, i
           }
         }
         cal.acdb_dev_id = platform_get_snd_device_acdb_id(cal.snd_dev_id);
-        ALOGV("Setting audio calibration for snd_device(%d) acdb_id(%d)",
+        ALOGD("Setting audio calibration for snd_device(%d) acdb_id(%d)",
                 cal.snd_dev_id, cal.acdb_dev_id);
         if(cal.acdb_dev_id == -EINVAL) {
             ALOGE("[%s] Invalid acdb_device id %d for snd device id %d",
@@ -11154,7 +11176,7 @@ static bool platform_check_codec_backend_cfg(struct audio_device* adev,
          */
         if (platform_spkr_use_default_sample_rate(adev->platform)) {
             sample_rate = CODEC_BACKEND_DEFAULT_SAMPLE_RATE;
-            ALOGV("%s:becf: afe: playback on codec device not supporting native playback set "
+            ALOGD("%s:becf: afe: playback on codec device not supporting native playback set "
             "default Sample Rate(48k)", __func__);
         }
 
@@ -11445,7 +11467,7 @@ static bool platform_check_capture_codec_backend_cfg(struct audio_device* adev,
             }
         }
         if ((sample_rate % INPUT_SAMPLING_RATE_11025 == 0) &&
-            (!is_usb_in_snd_dev(snd_device))) {
+            (!is_native_samplerate_supported_in_snd_dev(snd_device))) {
             ALOGV("%s:txbecf: afe: set sample rate to default Sample Rate(48k)",__func__);
             sample_rate = CODEC_BACKEND_DEFAULT_SAMPLE_RATE;
         }
@@ -11613,7 +11635,7 @@ int platform_set_snd_device_backend(snd_device_t device, const char *backend_tag
         goto done;
     }
 
-    ALOGV("%s: backend_tag_table[%s]: old = %s new = %s", __func__,
+    ALOGD("%s: backend_tag_table[%s]: old = %s new = %s", __func__,
           platform_get_snd_device_name(device),
           backend_tag_table[device] != NULL ? backend_tag_table[device]: "null",
           backend_tag);
@@ -11629,7 +11651,7 @@ int platform_set_snd_device_backend(snd_device_t device, const char *backend_tag
         if (hw_interface_table[device])
             free(hw_interface_table[device]);
 
-        ALOGV("%s: hw_interface_table[%d] = %s", __func__, device, hw_interface);
+        ALOGD("%s: hw_interface_table[%d] = %s", __func__, device, hw_interface);
         hw_interface_table[device] = strdup(hw_interface);
     }
 done:
@@ -12419,6 +12441,13 @@ void platform_check_and_update_copp_sample_rate(void* platform, snd_device_t snd
                   (snd_device == SND_DEVICE_OUT_SPDIF) ||
                   (snd_device == SND_DEVICE_OUT_OPTICAL))
         *sample_rate = platform_get_supported_copp_sampling_rate(stream_sr);
+
+    /*
+     * Use device sr as copp sr for CSRA targets
+     * to avoid mismatch between ADM and AFE sample rates.
+     */
+    if (!platform_spkr_use_default_sample_rate(platform))
+        *sample_rate = device_sr;
 
      ALOGI("sn_device %d device sr %d stream sr %d copp sr %d", snd_device, device_sr, stream_sr, *sample_rate);
 
