@@ -3261,7 +3261,8 @@ exit:
     return ret;
 }
 #else
-int audio_extn_utils_set_external_sink_latency(struct stream_out *out __unused)
+int audio_extn_utils_set_external_sink_latency(struct stream_out *out __unused,
+			struct audio_out_external_sink_latency_param *latency_param __unused)
 {
     ALOGD("%s:: configuring external sink latency not supported", __func__);
     return 0;

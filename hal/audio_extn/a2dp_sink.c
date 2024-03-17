@@ -787,7 +787,7 @@ static bool configure_a2dp_sink_decoder_format(bool *use_ttp_generator)
     return is_configured;
 }
 
-uint64_t audio_extn_a2dp_get_decoder_latency()
+uint32_t audio_extn_a2dp_get_decoder_latency()
 {
     uint32_t latency = 0;
 

@@ -8554,6 +8554,7 @@ int adev_open_output_stream(struct audio_hw_device *dev,
     out->flags = flags;
     list_init(&out->device_list);
     update_device_list(&out->device_list, devices, address, true /* add devices */);
+    out->devices = devices;
     out->dev = adev;
     out->hal_op_format = out->hal_ip_format = format = out->format = config->format;
     out->sample_rate = config->sample_rate;
