@@ -15,6 +15,8 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
+ *
+ * Copyright (c) 2024 Qualcomm Innovation Center, Inc. All rights reserved.
  */
 
 #ifndef QCOM_AUDIO_PLATFORM_H
@@ -368,7 +370,6 @@ enum {
 #define MIXER_PATH_MAX_LENGTH 100
 #define SND_CARD_MAX_LENGTH 100
 #define CODEC_VERSION_MAX_LENGTH 100
-
 #define CODEC_VARIANT_MAX_LENGTH 100
 #define MAX_VOL_INDEX 5
 #define MIN_VOL_INDEX 0
@@ -421,7 +422,6 @@ enum {
 
 #define VOIP_CAPTURE_PERIOD_COUNT 2
 #define VOIP_CAPTURE_PERIOD_DURATION_MSEC 20
-
 
 #define DEEP_BUFFER_PCM_DEVICE 0
 #define AUDIO_RECORD_PCM_DEVICE 0

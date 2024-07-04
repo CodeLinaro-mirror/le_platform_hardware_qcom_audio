@@ -15,6 +15,8 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
+ *
+ * Copyright (c) 2024 Qualcomm Innovation Center, Inc. All rights reserved.
  */
 
 #define LOG_TAG "msm8916_platform"
@@ -356,7 +358,6 @@ struct platform_data {
     struct listnode custom_mtmx_in_params_list;
     struct power_mode_cfg power_mode_cfg[SND_DEVICE_MAX];
     struct island_cfg island_cfg[SND_DEVICE_MAX];
-
 };
 
 struct  spkr_device_chmap {
@@ -1142,7 +1143,7 @@ const char* get_xml_file_path(const char* file_name)
 {
     audio_get_vendor_config_path(vendor_config_path, sizeof(vendor_config_path));
     snprintf(xml_file_path, sizeof(xml_file_path),
-        "%s/%s", vendor_config_path, file_name);
+             "%s/%s", vendor_config_path, file_name);
     return xml_file_path;
 }
 
@@ -1209,6 +1210,7 @@ static void update_codec_type(const char *snd_card_name) {
          is_slimbus_interface = true;
      }
 }
+
 static void query_platform(const char *snd_card_name,
                                       char *mixer_xml_path)
 {
@@ -1598,7 +1600,7 @@ static void query_platform(const char *snd_card_name,
         msm_be_id_array_len  =
             sizeof(msm_device_to_be_id_external_codec) / sizeof(msm_device_to_be_id_external_codec[0]);
     } else if (!strncmp(snd_card_name, "mdm9607-tomtom-i2s-snd-card",
-                 sizeof("mdm9607-tomtom-i2s-snd-card"))) {
+                        sizeof("mdm9607-tomtom-i2s-snd-card"))) {
         strlcpy(mixer_xml_path, MIXER_XML_PATH_WCD9330_I2S,
                 sizeof(MIXER_XML_PATH_WCD9330_I2S));
         msm_device_to_be_id = msm_device_to_be_id_external_codec;
@@ -1606,12 +1608,12 @@ static void query_platform(const char *snd_card_name,
             sizeof(msm_device_to_be_id_external_codec) / sizeof(msm_device_to_be_id_external_codec[0]);
    } else if (!strncmp(snd_card_name, "mdm-tasha-i2s-snd-card",
                        sizeof("mdm-tasha-i2s-snd-card"))) {
-	 strlcpy(mixer_xml_path, MIXER_XML_PATH_WCD9335_I2S,
-                sizeof(MIXER_XML_PATH_WCD9335_I2S));
-         msm_device_to_be_id = msm_device_to_be_id_external_codec;
-         msm_be_id_array_len  =
-            sizeof(msm_device_to_be_id_external_codec) / sizeof(msm_device_to_be_id_external_codec[0]);
-    } else {
+       strlcpy(mixer_xml_path, MIXER_XML_PATH_WCD9335_I2S,
+               sizeof(MIXER_XML_PATH_WCD9335_I2S));
+       msm_device_to_be_id = msm_device_to_be_id_external_codec;
+       msm_be_id_array_len =
+         sizeof(msm_device_to_be_id_external_codec) / sizeof(msm_device_to_be_id_external_codec[0]);
+   } else {
         strlcpy(mixer_xml_path, MIXER_XML_PATH,
                 sizeof(MIXER_XML_PATH));
 
@@ -1657,15 +1659,14 @@ void platform_set_tx_lpi_mode(void *platform, bool enable)
     struct audio_device *adev = my_data->adev;
 
     if (!enable && my_data->lpi_enabled) {
-        my_data->lpi_enabled = false;
-        ALOGV("%s: disabling TX LPI mode", __func__);
-        audio_route_reset_and_update_path(adev->audio_route, "tx-lpi-enable");
+      my_data->lpi_enabled = false;
+      ALOGV("%s: disabling TX LPI mode", __func__);
+      audio_route_reset_and_update_path(adev->audio_route, "tx-lpi-enable");
     }
-
     if (enable) {
-        my_data->lpi_enabled = true;
-        ALOGD("%s: enabling TX LPI mode", __func__);
-        audio_route_apply_and_update_path(adev->audio_route, "tx-lpi-enable");
+      my_data->lpi_enabled = true;
+      ALOGD("%s: enabling TX LPI mode", __func__);
+      audio_route_apply_and_update_path(adev->audio_route, "tx-lpi-enable");
     }
 }
 
@@ -1693,14 +1694,12 @@ void platform_set_native_dsd_speaker_cfg(struct stream_out *out)
     char spkr_mixer_path[MIXER_PATH_MAX_LENGTH];
 
     if (out == NULL)
-        return;
+      return;
 
     adev = out->dev;
     snprintf(spkr_mixer_path, MIXER_PATH_MAX_LENGTH, "speaker-native-dsd-%dch",
-                               out->config.channels);
-
+             out->config.channels);
     audio_route_apply_and_update_path(adev->audio_route, spkr_mixer_path);
-
     ALOGD("%s: applying DSD speaker configuration %s", __func__, spkr_mixer_path);
     return;
 }
@@ -2572,8 +2571,8 @@ void *platform_init(struct audio_device *adev)
                sizeof("sdm660-snd-card-skush")))
         platform_info_init(PLATFORM_INFO_XML_PATH_SKUSH, my_data, PLATFORM);
     else if (!strncmp(snd_card_name, "mdm9607-tomtom-i2s-snd-card",
-                 sizeof("mdm9607-tomtom-i2s-snd-card"))) 
-	platform_info_init(MIXER_XML_PATH_WCD9330_I2S, my_data, PLATFORM);
+                      sizeof("mdm9607-tomtom-i2s-snd-card")))
+        platform_info_init(MIXER_XML_PATH_WCD9330_I2S, my_data, PLATFORM);
     else
         platform_info_init(PLATFORM_INFO_XML_PATH, my_data, PLATFORM);
 
@@ -3276,31 +3275,27 @@ bool platform_check_all_backends_match(snd_device_t snd_device1, snd_device_t sn
     bool result = true;
 
     if ((snd_device1 < SND_DEVICE_MIN) || (snd_device1 >= SND_DEVICE_MAX)) {
-        ALOGE("%s: Invalid snd_device = %s", __func__,
-                platform_get_snd_device_name(snd_device1));
-        return false;
+      ALOGE("%s: Invalid snd_device = %s", __func__,
+            platform_get_snd_device_name(snd_device1));
+      return false;
     }
-
     if ((snd_device2 < SND_DEVICE_MIN) || (snd_device2 >= SND_DEVICE_MAX)) {
-        ALOGE("%s: Invalid snd_device = %s", __func__,
-                platform_get_snd_device_name(snd_device2));
-        return false;
+      ALOGE("%s: Invalid snd_device = %s", __func__,
+            platform_get_snd_device_name(snd_device2));
+      return false;
     }
-
     const char * be_itf1 = hw_interface_table[snd_device1];
     const char * be_itf2 = hw_interface_table[snd_device2];
-
     if (snd_device1 < SND_DEVICE_OUT_END && snd_device2 < SND_DEVICE_OUT_END) {
-        return platform_check_backends_match(snd_device1, snd_device2);
+      return platform_check_backends_match(snd_device1, snd_device2);
     } else if (snd_device1 >= SND_DEVICE_IN_BEGIN && snd_device2 >= SND_DEVICE_IN_BEGIN) {
-        if (NULL != be_itf1 && NULL != be_itf2) {
-            if (strcmp(be_itf2, be_itf1))
-                result = false;
-        }
+      if (NULL != be_itf1 && NULL != be_itf2) {
+        if (strcmp(be_itf2, be_itf1))
+          result = false;
+      }
     } else {
-        result = false;
+      result = false;
     }
-
     ALOGV("%s: be_itf1 = %s, be_itf2 = %s, match %d", __func__, be_itf1, be_itf2, result);
     return result;
 }
@@ -3313,24 +3308,22 @@ int platform_get_pcm_device_id(audio_usecase_t usecase, int device_type)
         ALOGE("%s: invalid usecase case idx %d", __func__, usecase);
         return device_id;
     }
-    if (device_type == PCM_PLAYBACK){
-        device_id = pcm_device_table[usecase][0];
+    if (device_type == PCM_PLAYBACK) {
+      device_id = pcm_device_table[usecase][0];
     }
     else
-        device_id = pcm_device_table[usecase][1];
+      device_id = pcm_device_table[usecase][1];
     return device_id;
 }
 
 uint64_t getQtime()
 {
     uint64_t qTimerCount = 0;
-
 #if __aarch64__
     asm volatile("mrs %0, cntvct_el0" : "=r" (qTimerCount));
 #else
     asm volatile("mrrc p15, 1, %Q0, %R0, c14" : "=r" (qTimerCount));
 #endif
-
     return qTimerCount;
 }
 
@@ -3345,40 +3338,42 @@ int platform_get_delay(void *platform, int pcm_device_id)
     int path_delay = 0;
 
     if (NULL == platform) {
-        ALOGE("%s: platform is NULL", __func__);
-        return -EINVAL;
+      ALOGE("%s: platform is NULL", __func__);
+      return -EINVAL;
     }
+
     if (pcm_device_id <= 0) {
-        ALOGE("%s: invalid pcm device id: %d", __func__, pcm_device_id);
-        return -EINVAL;
+      ALOGE("%s: invalid pcm device id: %d", __func__, pcm_device_id);
+      return -EINVAL;
     }
 
     adev = ((struct platform_data *)platform)->adev;
 
     // Mixer control format: "ADSP Path Latency NN"
     ctl_len = strlen(mixer_ctl_name) + 1 + strlen(deviceNo) + 1;
-
     mixer_str = (char*) calloc(ctl_len, sizeof(char));
+
     if (!mixer_str) {
-        ALOGE("%s: Could not allocate memory", __func__);
-        return -ENOMEM;
+      ALOGE("%s: Could not allocate memory", __func__);
+      return -ENOMEM;
     }
 
     snprintf(mixer_str, ctl_len, "%s %d", mixer_ctl_name, pcm_device_id);
-
     ctl = mixer_get_ctl_by_name(adev->mixer, mixer_str);
+
     if (!ctl) {
-        ALOGE("%s: Could not get ctl for mixer cmd - %s", __func__, mixer_str);
-        free(mixer_str);
-        return -EINVAL;
+      ALOGE("%s: Could not get ctl for mixer cmd - %s", __func__, mixer_str);
+      free(mixer_str);
+      return -EINVAL;
     }
 
     path_delay = mixer_ctl_get_value(ctl, 0);
-    if (path_delay < 0) {
-        ALOGE("%s: Could not get val for mixer cmd - %s", __func__, mixer_str);
-    }
-    ALOGD("%s: Path Delay: %d", __func__, path_delay);
 
+    if (path_delay < 0) {
+      ALOGE("%s: Could not get val for mixer cmd - %s", __func__, mixer_str);
+    }
+
+    ALOGD("%s: Path Delay: %d", __func__, path_delay);
     free(mixer_str);
     return path_delay;
 }
@@ -3501,7 +3496,6 @@ int platform_set_qtime(void *platform, int audio_pcm_device_id,
 
     return ret;
 }
-
 
 static int find_index(struct name_to_index * table, int32_t len, const char * name)
 {
@@ -6544,7 +6538,6 @@ void platform_check_and_set_device_ch_map(void *platform,
                                  my_data->spkr_ch_map->chmap, -1, device_be_idx);
     }
 }
-
 
 void platform_set_audio_source_delay(audio_source_t audio_source, int delay_ms)
 {
@@ -9690,10 +9683,10 @@ bool platform_set_fluence_nn_state(void *platform, bool state) {
      return false;
 }
 
-
 const char *platform_get_mixer_FM_RX_control(struct audio_device *adev) {
     return FM_RX_VOLUME;
 }
+
 int platform_get_fluence_nn_state(void *platform) {
     struct platform_data *my_data = (struct platform_data *)platform;
     int ret = -1;
