@@ -30,11 +30,6 @@
 #define LOG_TAG "audio_ext_hw_plugin"
 #define LOG_NDEBUG 0
 
-#ifdef VERY_VERY_VERBOSE_LOGGING
-#define ALOGVV ALOGV
-#else
-#define ALOGVV(a...) do { } while(0)
-#endif
 #include <errno.h>
 #include <pthread.h>
 #include <dlfcn.h>

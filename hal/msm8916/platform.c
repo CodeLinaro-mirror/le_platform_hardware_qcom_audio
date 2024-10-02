@@ -1214,7 +1214,6 @@ static void update_codec_type(const char *snd_card_name) {
 static void query_platform(const char *snd_card_name,
                                       char *mixer_xml_path)
 {
-
     if (!strncmp(snd_card_name, "msm8x16-snd-card-mtp",
                  sizeof("msm8x16-snd-card-mtp"))) {
         strlcpy(mixer_xml_path, MIXER_XML_PATH_MTP,
@@ -3422,6 +3421,7 @@ int send_qtime(void *platform, uint64_t qtime_value, int pcm_device_id)
 
     return ret;
 }
+
 int platform_set_qtime(void *platform, int audio_pcm_device_id,
                         int haptic_pcm_device_id)
 {
@@ -7812,7 +7812,7 @@ int platform_set_usecase_pcm_id(audio_usecase_t usecase, int32_t type, int32_t p
         ALOGE("%s: invalid usecase type", __func__);
         ret = -EINVAL;
     }
-    ALOGE("%s: pcm_device_table[%d][%d] = %d", __func__, usecase, type, pcm_id);
+    ALOGV("%s: pcm_device_table[%d][%d] = %d", __func__, usecase, type, pcm_id);
     pcm_device_table[usecase][type] = pcm_id;
 done:
     return ret;
@@ -9609,6 +9609,7 @@ int platform_get_display_port_ctl_index(int controller __unused,
 {
     return -EINVAL;
 }
+
 int platform_set_ext_display_device_v2(void *platform, int controller, int stream)
 {
     struct platform_data *my_data = (struct platform_data *)platform;
@@ -9703,5 +9704,6 @@ int platform_get_fluence_nn_state(void *platform) {
 
     return ret;
 }
+
 void audio_extn_a2dp_sink_init (void *adev) {
 }

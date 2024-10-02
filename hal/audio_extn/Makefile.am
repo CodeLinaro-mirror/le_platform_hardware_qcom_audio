@@ -33,7 +33,8 @@ audio_snd_monitor_la_LDFLAGS = -module -shared -avoid-version
 ################################## SSR LIB ####################################
 if SSR
 AM_CFLAGS += -DSSR_ENABLED
-AM_CFLAGS += -I ${WORKSPACE}/audio/mm-audio-external/audio-systems/surround_sound_3mic/libsurround_3mic_proc/surround_rec_interface/inc/
+AM_CFLAGS +=  -I ${WORKSPACE}/audio/mm-audio-noship/surround_sound_3mic/libsurround_3mic_proc/surround_rec_interface/inc/
+
 audio_ssrec_la_SOURCES = ssr.c \
                          device_utils.c
 
