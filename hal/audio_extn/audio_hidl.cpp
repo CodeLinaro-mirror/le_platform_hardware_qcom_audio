@@ -31,6 +31,7 @@
 #define LOG_TAG "audio_hw_hidl"
 
 #include "audio_hidl.h"
+#include <atomic>
 #include <cutils/properties.h>
 #include <log/log.h>
 #include <hidl/HidlTransportSupport.h>
@@ -49,6 +50,27 @@ using android::OK;
  */
 extern "C" int32_t registerIModuleBluetoothSWQti();
 
+/* IModule/bluetooth used to be registered only as a side effect of the first
+ * adev_open() call, which made its appearance on the service manager racy
+ * against VTS's restart-and-reconnect timeout (adev_open() only runs after a
+ * full ALSA/mixer/ACDB/UCM bring-up). Registering it as soon as this library
+ * is loaded removes that hardware bring-up latency from the critical path.
+ * The guard keeps the original adev_open() call site safe as a fallback.
+ */
+static std::atomic<bool> gBtModuleRegistered{false};
+
+static void registerBtModuleOnce() {
+    if (gBtModuleRegistered.exchange(true)) {
+        return;
+    }
+    int32_t ret = registerIModuleBluetoothSWQti();
+    ALOGW_IF(ret != 0, "Could not register IModule/bluetooth, ret=%d", ret);
+}
+
+__attribute__((constructor)) static void onAudioPrimaryLibLoad() {
+    registerBtModuleOnce();
+}
+
 extern "C" {
 int audio_extn_hidl_init() {
 
@@ -63,9 +85,10 @@ int audio_extn_hidl_init() {
     /* to register other hidls */
     /* Register android.hardware.audio.core.IModule/bluetooth.
      * VINTF declares this interface but it is never registered otherwise.
+     * Normally already registered by onAudioPrimaryLibLoad() above; this call
+     * is a no-op fallback in that case.
      */
-    int32_t ret = registerIModuleBluetoothSWQti();
-    ALOGW_IF(ret != 0, "Could not register IModule/bluetooth, ret=%d", ret);
+    registerBtModuleOnce();
 
     return 0;
 }
