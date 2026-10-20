@@ -114,13 +114,13 @@
 #define RECORD_GAIN_MAX 1.0f
 #define RECORD_VOLUME_CTL_MAX 0x2000
 
-/* Max seconds to wait for PARTIAL_DRAIN_READY from DSP before forcing drain-ready */
-#define PARTIAL_DRAIN_TIMEOUT_SEC 30
 #define COMPRESS_CAPTURE_AAC_MAX_OUTPUT_BUFFER_SIZE 2048
 #define COMPRESS_CAPTURE_AAC_PCM_SAMPLES_IN_FRAME 1024
 
 #define COMPRESS_OFFLOAD_FRAGMENT_SIZE (32 * 1024)
 #define FLAC_COMPRESS_OFFLOAD_FRAGMENT_SIZE (256 * 1024)
+/* Max seconds to wait for PARTIAL_DRAIN_READY from DSP before forcing drain-ready */
+#define PARTIAL_DRAIN_TIMEOUT_SEC 30
 
 /* treat as unsigned Q1.13 */
 #define APP_TYPE_GAIN_DEFAULT         0x2000
